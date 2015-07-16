@@ -3,7 +3,7 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('myreddit', ['ionic']).controller('MyredditCtrl',
+angular.module('myreddit', ['ionic', 'angularMoment']).controller('MyredditCtrl',
   function($scope, $http){
     stories = [];
     $http.get('https://www.reddit.com/r/Android/new/.json').success(
