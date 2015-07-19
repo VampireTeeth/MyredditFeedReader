@@ -5,16 +5,39 @@
 // the 2nd parameter is an array of 'requires'
 angular.module('myreddit', ['ionic', 'angularMoment']).controller('MyredditCtrl',
   function($scope, $http){
-    stories = [];
-    $http.get('https://www.reddit.com/r/Android/new/.json').success(
-      function(response){
-        //console.log(response);
-        angular.forEach(response.data.children, function(child){
-          stories.push(child.data);
-        });
+
+    $scope.stories = [];
+
+    function loadStories(params, callback) {
+      $http.get('https://www.reddit.com/r/Android/new/.json', {params: params}).success(
+        function(response){
+          var stories = [];
+          angular.forEach(response.data.children, function(child){
+            stories.push(child.data);
+          });
+          //console.log(stories);
+          callback(stories);
+          $scope.$broadcast('scroll.infiniteScrollComplete');
+        }
+      );
+    }
+
+    $scope.loadOlderStories = function () {
+      var params = {};
+      if ($scope.stories.length > 0) {
+        params['after'] = $scope.stories[$scope.stories.length - 1].name;
       }
-    );
-    $scope.stories = stories;
+      loadStories(params, function(stories){
+        $scope.stories = $scope.stories.concat(stories);
+      });
+    };
+
+    $scope.loadNewerStories = function () {
+      loadStories({'before': $scope.stories[0].name}, function(stories){
+        $scope.stories = stories.concat($scope.stories);
+      });
+    };
+
   }
 ).run(
   function($ionicPlatform) {
